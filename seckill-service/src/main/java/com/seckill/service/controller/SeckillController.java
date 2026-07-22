@@ -1,6 +1,7 @@
 package com.seckill.service.controller;
 
 import com.seckill.common.result.Result;
+import com.seckill.common.utils.TraceUtil;
 import com.seckill.service.feign.OrderFeignClient;
 import com.seckill.service.feign.PaymentFeignClient;
 import com.seckill.service.feign.StockFeignClient;
@@ -24,27 +25,47 @@ public class SeckillController {
     @PostMapping("/buy")
     public Result<String> buy(@RequestParam("userId") Long userId,
                                @RequestParam("goodsId") Long goodsId) {
+        String traceId = TraceUtil.getTraceId();
+        String threadName = Thread.currentThread().getName();
+
+        log.info("===== [{}][{}] 秒杀请求开始: userId={}, goodsId={}", traceId, threadName, userId, goodsId);
+
+        long start = System.currentTimeMillis();
+
         // 1. 扣库存
+        log.info("[{}][{}] Step1: 调用库存服务扣减库存 goodsId={}", traceId, threadName, goodsId);
         Result<String> stockResult = stockFeignClient.decrease(goodsId);
+        log.info("[{}][{}] Step1: 库存结果={}", traceId, threadName, stockResult);
+
         if (stockResult.getCode() != 200) {
+            long cost = System.currentTimeMillis() - start;
+            log.warn("[{}][{}] 秒杀失败: {} (耗时={}ms)", traceId, threadName, stockResult.getMsg(), cost);
             return stockResult;
         }
 
-        // 2. 查商品价格（模拟：hardcode 7999）
+        // 2. 查商品价格
         java.math.BigDecimal amount = new java.math.BigDecimal("7999");
 
         // 3. 扣余额
+        log.info("[{}][{}] Step2: 调用支付服务扣减余额 userId={}, amount={}", traceId, threadName, userId, amount);
         Result<String> payResult = paymentFeignClient.pay(userId, amount);
         if (payResult.getCode() != 200) {
+            long cost = System.currentTimeMillis() - start;
+            log.warn("[{}][{}] 支付失败: {} (耗时={}ms)", traceId, threadName, payResult.getMsg(), cost);
             return payResult;
         }
 
         // 4. 创建订单
+        log.info("[{}][{}] Step3: 调用订单服务创建订单", traceId, threadName);
         Result<String> orderResult = orderFeignClient.createOrder(userId, goodsId, amount);
         if (orderResult.getCode() != 200) {
+            long cost = System.currentTimeMillis() - start;
+            log.warn("[{}][{}] 订单创建失败: {} (耗时={}ms)", traceId, threadName, orderResult.getMsg(), cost);
             return orderResult;
         }
 
-        return Result.success("抢购成功");
+        long cost = System.currentTimeMillis() - start;
+        log.info("===== [{}][{}] 秒杀成功! 订单号={} (耗时={}ms)", traceId, threadName, orderResult.getData(), cost);
+        return Result.success(orderResult.getData(), "抢购成功");
     }
 }

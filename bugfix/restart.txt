@@ -1,0 +1,15 @@
+# 1. 查看当前保留范围
+netsh int ipv4 show excludedportrange protocol=tcp
+
+# 2. 选一个低于最低保留段的端口
+#    比如当前最低保留端是 9384，就选 9383 以下的
+#    公式: 主端口 + 1000 < 最低保留端
+#    例: 7948 + 1000 = 8948 < 9384  → 安全
+
+# 3. 如果下回保留范围变了，按这个公式重新计算
+#    Nacos_HTTP = 最低保留端 - 1500
+#    Nacos_gRPC = Nacos_HTTP + 1000
+#    比如最低保留端变成 8000 → HTTP=6500, gRPC=7500
+
+# 4. 修改 docker-compose.yml 和 bootstrap.yml 里的端口号
+#    然后 docker compose up -d --force-recreate nacos
