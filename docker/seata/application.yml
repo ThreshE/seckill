@@ -1,5 +1,4 @@
-# Seata Server 閰嶇疆 鈥?Nacos 娉ㄥ唽涓績 + MySQL 浜嬪姟瀛樺偍
-
+# Seata Server 闁板秶鐤?閳?Nacos 濞夈劌鍞芥稉顓炵妇 + MySQL 娴滃濮熺€涙ê鍋?
 server:
   port: 7091
 
@@ -17,7 +16,7 @@ seata:
     type: nacos
     nacos:
       application: seata-server
-      server-addr: host.docker.internal:8448
+      server-addr: host.docker.internal:7948
       group: SEATA_GROUP
       namespace: ""
       cluster: default

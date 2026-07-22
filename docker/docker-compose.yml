@@ -25,10 +25,10 @@ services:
     environment:
       MODE: standalone
       NACOS_AUTH_ENABLE: 'false'
-      SPRING_APPLICATION_JSON: '{"server.port": 8448}'
+      SPRING_APPLICATION_JSON: '{"server.port": 7948}'
     ports:
-      - "8448:8448"
-      - "9448:9448"
+      - "7948:7948"
+      - "8948:8948"
     volumes:
       - nacos_data:/home/nacos/data
 
