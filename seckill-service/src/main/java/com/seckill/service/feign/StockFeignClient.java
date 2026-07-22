@@ -10,4 +10,7 @@ public interface StockFeignClient {
 
     @PostMapping("/stock/decrease")
     Result<String> decrease(@RequestParam("goodsId") Long goodsId);
+
+    @PostMapping("/stock/decrease/v2")
+    Result<String> decreaseV2(@RequestParam("goodsId") Long goodsId);
 }

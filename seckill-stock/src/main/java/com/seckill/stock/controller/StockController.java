@@ -19,4 +19,9 @@ public class StockController {
     public Result<String> decrease(@RequestParam("goodsId") Long goodsId) {
         return stockService.decrease(goodsId);
     }
+
+    @PostMapping("/decrease/v2")
+    public Result<String> decreaseV2(@RequestParam("goodsId") Long goodsId) {
+        return stockService.decreaseV2(goodsId);
+    }
 }
