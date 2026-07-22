@@ -24,4 +24,29 @@ public class StockController {
     public Result<String> decreaseV2(@RequestParam("goodsId") Long goodsId) {
         return stockService.decreaseV2(goodsId);
     }
+
+    @PostMapping("/decrease/v3-1")
+    public Result<String> decreaseV31(@RequestParam("goodsId") Long goodsId) {
+        return stockService.decreaseV31(goodsId);
+    }
+
+    @PostMapping("/decrease/v3-2")
+    public Result<String> decreaseV32(@RequestParam("goodsId") Long goodsId) {
+        return stockService.decreaseV32(goodsId);
+    }
+
+    @PostMapping("/decrease/v3-3")
+    public Result<String> decreaseV33(@RequestParam("goodsId") Long goodsId) {
+        return stockService.decreaseV33(goodsId);
+    }
+
+    @PostMapping("/decrease/v3-4")
+    public Result<String> decreaseV34(@RequestParam("goodsId") Long goodsId) {
+        return stockService.decreaseV34(goodsId);
+    }
+
+    @PostMapping("/decrease/v3-5")
+    public Result<String> decreaseV35(@RequestParam("goodsId") Long goodsId) {
+        return stockService.decreaseV35(goodsId);
+    }
 }

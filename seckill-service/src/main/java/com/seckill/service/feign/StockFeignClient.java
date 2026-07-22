@@ -13,4 +13,19 @@ public interface StockFeignClient {
 
     @PostMapping("/stock/decrease/v2")
     Result<String> decreaseV2(@RequestParam("goodsId") Long goodsId);
+
+    @PostMapping("/stock/decrease/v3-1")
+    Result<String> decreaseV31(@RequestParam("goodsId") Long goodsId);
+
+    @PostMapping("/stock/decrease/v3-2")
+    Result<String> decreaseV32(@RequestParam("goodsId") Long goodsId);
+
+    @PostMapping("/stock/decrease/v3-3")
+    Result<String> decreaseV33(@RequestParam("goodsId") Long goodsId);
+
+    @PostMapping("/stock/decrease/v3-4")
+    Result<String> decreaseV34(@RequestParam("goodsId") Long goodsId);
+
+    @PostMapping("/stock/decrease/v3-5")
+    Result<String> decreaseV35(@RequestParam("goodsId") Long goodsId);
 }

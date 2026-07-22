@@ -19,6 +19,13 @@ services:
     ports:
       - "6379:6379"
 
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: seckill-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   nacos:
     image: nacos/nacos-server:v2.3.2
     container_name: seckill-nacos

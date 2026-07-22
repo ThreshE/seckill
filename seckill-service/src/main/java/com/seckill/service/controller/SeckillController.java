@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.util.function.Function;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/seckill")
@@ -113,6 +116,86 @@ public class SeckillController {
 
         long cost = System.currentTimeMillis() - start;
         log.info("===== [{}][{}] 秒杀成功[V2-ReentrantLock]! 订单号={} (耗时={}ms)", traceId, threadName, orderResult.getData(), cost);
+        return Result.success(orderResult.getData(), "抢购成功");
+    }
+
+    @PostMapping("/buy/v3-1")
+    public Result<String> buyV31(@RequestParam("userId") Long userId,
+                                  @RequestParam("goodsId") Long goodsId) {
+        return buySync("V3-1-DB-Atomic", userId, goodsId, stockFeignClient::decreaseV31);
+    }
+
+    @PostMapping("/buy/v3-2")
+    public Result<String> buyV32(@RequestParam("userId") Long userId,
+                                  @RequestParam("goodsId") Long goodsId) {
+        return buySync("V3-2-DB-Optimistic", userId, goodsId, stockFeignClient::decreaseV32);
+    }
+
+    @PostMapping("/buy/v3-3")
+    public Result<String> buyV33(@RequestParam("userId") Long userId,
+                                  @RequestParam("goodsId") Long goodsId) {
+        return buySync("V3-3-Redis-Lock", userId, goodsId, stockFeignClient::decreaseV33);
+    }
+
+    @PostMapping("/buy/v3-4")
+    public Result<String> buyV34(@RequestParam("userId") Long userId,
+                                  @RequestParam("goodsId") Long goodsId) {
+        String traceId = TraceUtil.getTraceId();
+        String threadName = Thread.currentThread().getName();
+
+        log.info("===== [{}][{}] 秒杀请求开始[V3-4-MQ-Serial]: userId={}, goodsId={}", traceId, threadName, userId, goodsId);
+        Result<String> stockResult = stockFeignClient.decreaseV34(goodsId);
+        log.info("[{}][{}] V3-4 库存入队结果={}", traceId, threadName, stockResult);
+        return stockResult;
+    }
+
+    @PostMapping("/buy/v3-5")
+    public Result<String> buyV35(@RequestParam("userId") Long userId,
+                                  @RequestParam("goodsId") Long goodsId) {
+        return buySync("V3-5-Redis-PreDeduct", userId, goodsId, stockFeignClient::decreaseV35);
+    }
+
+    private Result<String> buySync(String version,
+                                   Long userId,
+                                   Long goodsId,
+                                   Function<Long, Result<String>> stockDecrease) {
+        String traceId = TraceUtil.getTraceId();
+        String threadName = Thread.currentThread().getName();
+
+        log.info("===== [{}][{}] 秒杀请求开始[{}]: userId={}, goodsId={}", traceId, threadName, version, userId, goodsId);
+
+        long start = System.currentTimeMillis();
+
+        log.info("[{}][{}] Step1: 调用库存服务扣减库存[{}] goodsId={}", traceId, threadName, version, goodsId);
+        Result<String> stockResult = stockDecrease.apply(goodsId);
+        log.info("[{}][{}] Step1: 库存结果[{}]={}", traceId, threadName, version, stockResult);
+
+        if (stockResult.getCode() != 200) {
+            long cost = System.currentTimeMillis() - start;
+            log.warn("[{}][{}] 秒杀失败[{}]: {} (耗时={}ms)", traceId, threadName, version, stockResult.getMsg(), cost);
+            return stockResult;
+        }
+
+        BigDecimal amount = new BigDecimal("7999");
+
+        log.info("[{}][{}] Step2: 调用支付服务扣减余额[{}] userId={}, amount={}", traceId, threadName, version, userId, amount);
+        Result<String> payResult = paymentFeignClient.pay(userId, amount);
+        if (payResult.getCode() != 200) {
+            long cost = System.currentTimeMillis() - start;
+            log.warn("[{}][{}] 支付失败[{}]: {} (耗时={}ms)", traceId, threadName, version, payResult.getMsg(), cost);
+            return payResult;
+        }
+
+        log.info("[{}][{}] Step3: 调用订单服务创建订单[{}]", traceId, threadName, version);
+        Result<String> orderResult = orderFeignClient.createOrder(userId, goodsId, amount);
+        if (orderResult.getCode() != 200) {
+            long cost = System.currentTimeMillis() - start;
+            log.warn("[{}][{}] 订单创建失败[{}]: {} (耗时={}ms)", traceId, threadName, version, orderResult.getMsg(), cost);
+            return orderResult;
+        }
+
+        long cost = System.currentTimeMillis() - start;
+        log.info("===== [{}][{}] 秒杀成功[{}]! 订单号={} (耗时={}ms)", traceId, threadName, version, orderResult.getData(), cost);
         return Result.success(orderResult.getData(), "抢购成功");
     }
 }
