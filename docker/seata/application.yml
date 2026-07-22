@@ -1,0 +1,62 @@
+# Seata Server 閰嶇疆 鈥?Nacos 娉ㄥ唽涓績 + MySQL 浜嬪姟瀛樺偍
+
+server:
+  port: 7091
+
+logging:
+  file:
+    name: /root/logs/seata/seata.log
+  level:
+    io.seata: info
+
+seata:
+  config:
+    type: file
+
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: host.docker.internal:8448
+      group: SEATA_GROUP
+      namespace: ""
+      cluster: default
+      username: ""
+      password: ""
+
+  store:
+    mode: db
+    db:
+      datasource: druid
+      db-type: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://host.docker.internal:3306/seata?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+      user: root
+      password: 123456
+      min-conn: 5
+      max-conn: 100
+      global-table: global_table
+      branch-table: branch_table
+      lock-table: lock_table
+      distributed-lock-table: distributed_lock_table
+      query-limit: 100
+      max-wait: 5000
+
+  server:
+    service-port: 8091
+    max-commit-retry-timeout: -1
+    max-rollback-retry-timeout: -1
+    rollback-retry-timeout-unlock-enable: false
+    enable-check-auth-handler: true
+    enable-parallel-request-handling: false
+    recovery:
+      committing-retry-period: 1000
+      asynchronous-committing-retry-period: 1000
+      rollbacking-retry-period: 1000
+      timeout-retry-period: 1000
+    undo:
+      log-save-days: 7
+      log-delete-period: 86400000
+    session:
+      branch-async-queue-size: 5000
+      enable-branch-async-remove: false

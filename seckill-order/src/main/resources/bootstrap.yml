@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: seckill-order
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8448
+        file-extension: yaml
+        namespace: f63e0d51-9ea6-4157-b295-8b1f9db39a88
+        group: DEFAULT_GROUP
+        refresh-enabled: true
+      discovery:
+        server-addr: localhost:8448
+        namespace: f63e0d51-9ea6-4157-b295-8b1f9db39a88

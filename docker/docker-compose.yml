@@ -1,0 +1,53 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: seckill-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: seckill
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis:7
+    container_name: seckill-redis
+    ports:
+      - "6379:6379"
+
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: seckill-nacos
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: 'false'
+      SPRING_APPLICATION_JSON: '{"server.port": 8448}'
+    ports:
+      - "8448:8448"
+      - "9448:9448"
+    volumes:
+      - nacos_data:/home/nacos/data
+
+  seata:
+    image: seataio/seata-server:2.0.0
+    container_name: seckill-seata
+    ports:
+      - "8091:8091"
+    environment:
+      SEATA_IP: host.docker.internal
+      SEATA_PORT: 8091
+    volumes:
+      - ./seata/application.yml:/seata-server/resources/application.yml
+    depends_on:
+      nacos:
+        condition: service_started
+      mysql:
+        condition: service_started
+
+volumes:
+  mysql_data:
+  nacos_data:

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+         http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <!-- 濡炪倕婀卞ú鎵磼閸曨厾鐭?-->
+    <groupId>com.seckill</groupId>
+
+
+    <!-- 闁绘牞娉涙导鎰矙鐎ｎ亝鍊崇紒?-->
+    <artifactId>seckill-system</artifactId>
+
+
+    <version>1.0-SNAPSHOT</version>
+
+
+    <!-- 闂傚牊鍧巃va濡炪倕婀卞ú浼存晬鐏炶棄娑ч悹鎰枙閻绮婚敍鍕€?-->
+    <packaging>pom</packaging>
+
+
+
+    <!-- 閻庢稒鍔栬啯闁?-->
+        <modules>
+        <module>seckill-common</module>
+        <module>seckill-gateway</module>
+        <module>seckill-service</module>
+        <module>seckill-stock</module>
+        <module>seckill-order</module>
+        <module>seckill-payment</module>
+    </modules>
+
+
+
+    <properties>
+
+
+        <!-- Java闁绘鐗婂﹢?-->
+        <java.version>17</java.version>
+
+
+        <!-- Spring Boot闁绘鐗婂﹢?-->
+        <spring-boot.version>3.2.5</spring-boot.version>
+
+
+        <!-- Spring Cloud闁绘鐗婂﹢?-->
+        <spring-cloud.version>2023.0.2</spring-cloud.version>
+
+
+        <!-- Spring Cloud Alibaba -->
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+
+
+        <project.build.sourceEncoding>
+            UTF-8
+        </project.build.sourceEncoding>
+
+
+    </properties>
+
+
+
+    <!-- 缂備胶鍠嶇粩瀛樼瑹濠靛﹦顩柣妤€鐗婂﹢鎵不閿涘嫭鍊?-->
+    <dependencyManagement>
+
+        <dependencies>
+
+
+            <!-- Spring Boot -->
+            <dependency>
+
+                <groupId>
+                    org.springframework.boot
+                </groupId>
+
+                <artifactId>
+                    spring-boot-dependencies
+                </artifactId>
+
+                <version>
+                    ${spring-boot.version}
+                </version>
+
+                <type>pom</type>
+
+                <scope>import</scope>
+
+            </dependency>
+
+
+
+            <!-- Spring Cloud -->
+            <dependency>
+
+                <groupId>
+                    org.springframework.cloud
+                </groupId>
+
+                <artifactId>
+                    spring-cloud-dependencies
+                </artifactId>
+
+                <version>
+                    ${spring-cloud.version}
+                </version>
+
+                <type>pom</type>
+
+                <scope>import</scope>
+
+            </dependency>
+
+
+
+            <!-- Spring Cloud Alibaba -->
+
+            <dependency>
+
+                <groupId>
+                    com.alibaba.cloud
+                </groupId>
+
+                <artifactId>
+                    spring-cloud-alibaba-dependencies
+                </artifactId>
+
+                <version>
+                    ${spring-cloud-alibaba.version}
+                </version>
+
+                <type>pom</type>
+
+                <scope>import</scope>
+
+            </dependency>
+
+            <!-- MyBatis-Plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+
+        </dependencies>
+
+
+    </dependencyManagement>
+
+
+
+    <build>
+
+        <plugins>
+
+
+            <!-- Java缂傚倹鐗為惁褔骞撻幒宥嗩偨 -->
+
+            <plugin>
+
+                <groupId>
+                    org.apache.maven.plugins
+                </groupId>
+
+                <artifactId>
+                    maven-compiler-plugin
+                </artifactId>
+
+
+                <version>
+                    3.11.0
+                </version>
+
+
+                <configuration>
+
+                    <source>
+                        17
+                    </source>
+
+
+                    <target>
+                        17
+                    </target>
+
+
+                    <encoding>
+                        UTF-8
+                    </encoding>
+
+                </configuration>
+
+
+            </plugin>
+
+
+        </plugins>
+
+
+    </build>
+
+
+</project>
