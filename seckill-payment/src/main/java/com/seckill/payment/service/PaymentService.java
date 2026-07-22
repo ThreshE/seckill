@@ -16,8 +16,12 @@ public class PaymentService {
 
     private final AccountMapper accountMapper;
 
-    public Result<String> pay(Long userId, BigDecimal amount) {
+    /**
+     * V1: 使用 synchronized 保证余额扣减的原子性
+     */
+    public synchronized Result<String> pay(Long userId, BigDecimal amount) {
         String threadName = Thread.currentThread().getName();
+
         UserAccount account = accountMapper.selectOne(
             new LambdaQueryWrapper<UserAccount>().eq(UserAccount::getUserId, userId)
         );
@@ -37,8 +41,7 @@ public class PaymentService {
         account.setBalance(afterBalance);
         accountMapper.updateById(account);
 
-        log.info("[{}] 扣余额: userId={}, {} -> {}  <== 并发问题：其他线程可能也读到 {} 并写回相同的值",
-                threadName, userId, beforeBalance, afterBalance, beforeBalance);
+        log.info("[{}] 扣余额成功: userId={}, {} -> {} [synchronized]", threadName, userId, beforeBalance, afterBalance);
         return Result.success("ok");
     }
 }
